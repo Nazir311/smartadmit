@@ -1,7 +1,6 @@
 class AppConstants {
   // For Chrome/Web
-  static const String baseUrl = 'http://localhost:3000/api';
-
+  static const String baseUrl = 'https://smartadmit.onrender.com/api';
   static const String chatEndpoint = '/chat';
   static const String departmentsEndpoint = '/departments';
   static const String recommendEndpoint = '/recommend';
