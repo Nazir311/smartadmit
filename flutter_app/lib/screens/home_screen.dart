@@ -66,11 +66,7 @@ class _GlassCard extends StatelessWidget {
   final List<BoxShadow>? shadow;
 
   const _GlassCard({
-    super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(20),
-    this.radius = 20,
-    this.shadow,
   });
 
   @override
@@ -186,13 +182,13 @@ class _Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     width: _C.sidebarW,
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
         begin: Alignment.topCenter, end: Alignment.bottomCenter,
         colors: [_C.dark, Color(0xFF0B1220)],
       ),
-      border: const Border(right: BorderSide(color: Color(0xFF1E293B))),
-      boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 30, offset: Offset(6, 0))],
+      border: Border(right: BorderSide(color: Color(0xFF1E293B))),
+      boxShadow: [BoxShadow(color: Color(0x33000000), blurRadius: 30, offset: Offset(6, 0))],
     ),
     child: Stack(children: [
       // Ambient glow blob
@@ -256,7 +252,7 @@ class _Sidebar extends StatelessWidget {
             child: Row(children: [
               Container(
                 width: 36, height: 36,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: _C.brandGrad,
                   shape: BoxShape.circle,
                 ),
@@ -540,9 +536,9 @@ class _Body extends StatelessWidget {
 class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
-    decoration: BoxDecoration(
+    decoration: const BoxDecoration(
       color: _C.surface,
-      border: const Border(bottom: BorderSide(color: _C.border)),
+      border: Border(bottom: BorderSide(color: _C.border)),
     ),
     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
     child: Row(children: [

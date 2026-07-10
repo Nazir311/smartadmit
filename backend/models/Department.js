@@ -1,33 +1,88 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const departmentSchema = new mongoose.Schema({
-  code: { type: String, required: true, unique: true, uppercase: true, trim: true },
-  name: { type: String, required: true, trim: true },
-  faculty: { type: String, required: true },
-  minGPA: { type: Number, required: true, min: 0, max: 5 },
-  seats: { type: Number, required: true },
-  tuitionPerSemester: { type: Number, required: true },
-  duration: { type: String, required: true },
-  description: { type: String, required: true },
-  careers: [{ type: String }],
-  requiredSubjects: [{ type: String }],
-  admissionTestRequired: { type: Boolean, default: true },
-  tags: [{ type: String, lowercase: true }],
-  keywordMatch: [{ type: String, lowercase: true }],
-  careerMatch: [{ type: String, lowercase: true }],
-  roadmap: {
-    year1: [String],
-    year2: [String],
-    year3: [String],
-    year4: [String],
-    year5: [String]
+const departmentSchema = new mongoose.Schema(
+  {
+    code: {
+      type: String,
+      required: true,
+      unique: true,
+      uppercase: true,
+      trim: true,
+    },
+
+    department: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    faculty: {
+      type: String,
+      required: true,
+    },
+
+    tuitionFee: Number,
+
+    totalCredits: Number,
+
+    duration: String,
+
+    description: String,
+
+    skills: [String],
+
+    majorSubjects: [String],
+
+    careerPaths: [String],
+
+    jobSectors: [String],
+
+    topCompanies: [String],
+
+    entrySalary: String,
+
+    midSalary: String,
+
+    seniorSalary: String,
+
+    bdDemand: String,
+
+    globalDemand: String,
+
+    admissionRequirement: String,
+
+    scholarship: String,
+
+    internship: String,
+
+    personalityMatch: String,
+
+    interestTags: [String],
+
+    higherStudy: String,
+
+    difficulty: String,
+
+    programmingLevel: String,
+
+    mathLevel: String,
+
+    remoteOpportunities: String,
+
+    freelancingOpportunities: String,
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
-  jobRoles: [{ type: String }],
-  industrySectors: [{ type: String }],
-  isActive: { type: Boolean, default: true }
-}, { timestamps: true });
+  {
+    timestamps: true,
+  }
+);
 
-departmentSchema.index({ minGPA: 1 });
-departmentSchema.index({ tags: 1 });
+departmentSchema.index({ code: 1 });
+departmentSchema.index({ faculty: 1 });
+departmentSchema.index({ interestTags: 1 });
 
-module.exports = mongoose.model('Department', departmentSchema);
+module.exports = mongoose.model("Department", departmentSchema);
