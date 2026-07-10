@@ -41,55 +41,89 @@ const extractList = (msg) => {
 };
 
 const buildParentSummaryEn = (top3, profile) => {
+
+  if (!top3 || top3.length === 0) {
+    return "No recommendation available.";
+  }
+
   const top = top3[0];
-  const name = profile.name || 'your child';
+
   return `Dear Parent,
 
-Based on ${name}'s academic profile (SSC: ${profile.sscGpa}, HSC: ${profile.hscGpa}) and interests, our AI system recommends:
+Based on your child's academic profile:
 
-**#1: ${top.name} (${top.code}) — ${top.confidenceScore}% Match**
-${top.reasoning[0] || 'Strong academic and career alignment.'}
+Recommended Department:
+${top.department}
 
-**Why this department?**
-${top.reasoning.join(' • ')}
+Department Code:
+${top.code}
 
-**Tuition:** BDT ${top.tuitionPerSemester.toLocaleString()} per semester
-**Scholarship Chance:** ${top.scholarshipChance}
+Faculty:
+${top.faculty}
 
-**Career Opportunities:**
-${top.jobRoles.slice(0, 3).map(j => `• ${j}`).join('\n')}
+Duration:
+${top.duration}
 
-**Also Consider:**
-• ${top3[1]?.name || ''} — ${top3[1]?.confidenceScore || ''}% match
-• ${top3[2]?.name || ''} — ${top3[2]?.confidenceScore || ''}% match
+Tuition Fee:
+BDT ${top.tuitionFee}
 
-This recommendation is based on GPA, interests, career goals, and financial situation. We encourage you to discuss these options with your child.`;
+Starting Salary:
+${top.salary}
+
+Career Paths:
+${(top.careerPaths || []).slice(0,5).join(", ")}
+
+Top Companies:
+${(top.companies || []).join(", ")}
+
+Bangladesh Demand:
+${top.demand}
+
+Summary:
+${top.summary}
+
+Thank you.`;
 };
 
 const buildParentSummaryBn = (top3, profile) => {
+
+  if (!top3 || top3.length === 0) {
+    return "কোন সুপারিশ পাওয়া যায়নি।";
+  }
+
   const top = top3[0];
+
   return `প্রিয় অভিভাবক,
 
-আপনার সন্তানের একাডেমিক প্রোফাইল (SSC: ${profile.sscGpa}, HSC: ${profile.hscGpa}) এবং আগ্রহের উপর ভিত্তি করে আমাদের AI সিস্টেম সুপারিশ করছে:
+প্রস্তাবিত বিভাগ:
 
-**#১: ${top.name} (${top.code}) — ${top.confidenceScore}% মিল**
+${top.department}
 
-**কেন এই বিভাগ?**
-• একাডেমিক যোগ্যতা ভালোভাবে মিলে যায়
-• ক্যারিয়ার লক্ষ্যের সাথে সামঞ্জস্যপূর্ণ
-• ভবিষ্যতে ভালো চাকরির সুযোগ রয়েছে
+কোড:
+${top.code}
 
-**টিউশন ফি:** প্রতি সেমিস্টারে BDT ${top.tuitionPerSemester.toLocaleString()}
-**বৃত্তির সুযোগ:** ${top.scholarshipChance}
+ফ্যাকাল্টি:
+${top.faculty}
 
-**ক্যারিয়ার সুযোগ:**
-${top.jobRoles.slice(0, 3).map(j => `• ${j}`).join('\n')}
+মেয়াদ:
+${top.duration}
 
-**অন্যান্য বিকল্প:**
-• ${top3[1]?.name || ''} — ${top3[1]?.confidenceScore || ''}% মিল
-• ${top3[2]?.name || ''} — ${top3[2]?.confidenceScore || ''}% মিল
+টিউশন ফি:
+BDT ${top.tuitionFee}
 
-এই পরামর্শটি GPA, আগ্রহ, ক্যারিয়ার লক্ষ্য এবং আর্থিক পরিস্থিতির উপর ভিত্তি করে তৈরি।`;
+শুরুর বেতন:
+${top.salary}
+
+ক্যারিয়ার:
+${(top.careerPaths || []).slice(0,5).join(", ")}
+
+প্রধান কোম্পানি:
+${(top.companies || []).join(", ")}
+
+বাংলাদেশে চাহিদা:
+${top.demand}
+
+${top.summary}`;
 };
 
 const processAgentMessage = async (message, sessionId) => {
@@ -211,19 +245,74 @@ const processAgentMessage = async (message, sessionId) => {
 };
 
 const buildRecommendationMessage = (top3, profile) => {
-  const effectiveGpa = Math.min(profile.sscGpa || 0, profile.hscGpa || 0);
-  let msg = `🎯 **Your Personalized Department Recommendations**\n\nBased on your GPA of **${effectiveGpa}**, interests, and career goals:\n\n`;
 
-  top3.forEach((dept, i) => {
-    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉';
-    msg += `${medal} **${dept.name} (${dept.code}) — ${dept.confidenceScore}% Match**\n`;
-    msg += `• Academic: ${dept.academicAlignment}% | Interest: ${dept.interestAlignment}% | Career: ${dept.careerAlignment}% | Practical: ${dept.practicalFit}%\n`;
-    msg += `• ${dept.reasoning[0]}\n`;
-    msg += `• Tuition: BDT ${dept.tuitionPerSemester.toLocaleString()}/sem | ${dept.scholarshipChance}\n\n`;
+  if (!top3 || top3.length === 0) {
+    return "❌ No suitable department found.";
+  }
+
+  const effectiveGpa = Math.min(profile.sscGpa || 0, profile.hscGpa || 0);
+
+  let msg =
+`🎯 **Your Personalized Department Recommendations**
+
+Based on your GPA (**${effectiveGpa}**) and your interests, here are your best matches:
+
+`;
+
+  top3.forEach((dept, index) => {
+
+    const medal =
+      index === 0
+        ? "🥇"
+        : index === 1
+        ? "🥈"
+        : "🥉";
+
+    msg +=
+`${medal} **${dept.department} (${dept.code})**
+
+⭐ Score: ${dept.score}
+
+🎯 Confidence: ${dept.confidence}
+
+🏛 Faculty: ${dept.faculty}
+
+⏳ Duration: ${dept.duration}
+
+💰 Tuition Fee:
+BDT ${dept.tuitionFee}
+
+💵 Starting Salary:
+${dept.salary}
+
+📈 Bangladesh Demand:
+${dept.demand}
+
+💼 Career Paths:
+${dept.careerPaths.slice(0,4).join(", ")}
+
+🏢 Top Companies:
+${dept.companies.join(", ")}
+
+📝 Summary:
+${dept.summary}
+
+----------------------------------------
+
+`;
+
   });
 
-  msg += `\n💡 **What would you like to do next?**\n• Ask *"Show roadmap for CSE"* to see the 4-year plan\n• Ask *"Parent mode"* to get a parent-friendly summary\n• Ask *"Download report"* to get a PDF\n• Ask any free question about DIU admission`;
+  msg +=
+`📄 You can now:
+
+• Download Report
+• Parent Mode
+• Compare Departments
+• Ask any admission question`;
+
   return msg;
+
 };
 
 module.exports = { processAgentMessage };
