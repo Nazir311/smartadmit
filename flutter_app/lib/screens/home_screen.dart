@@ -66,34 +66,25 @@ class _GlassCard extends StatelessWidget {
   final List<BoxShadow>? shadow;
 
   const _GlassCard({
+    super.key,
     required this.child,
+    this.padding = const EdgeInsets.all(20),
+    this.radius = 24,
+    this.shadow,
   });
 
   @override
-  Widget build(BuildContext context) => Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(radius),
-      boxShadow: shadow ?? _C.card,
-    ),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft, end: Alignment.bottomRight,
-              colors: [Colors.white.withOpacity(0.82), Colors.white.withOpacity(0.60)],
-            ),
-            borderRadius: BorderRadius.circular(radius),
-            border: Border.all(color: Colors.white.withOpacity(0.7), width: 1.2),
-          ),
-          child: child,
-        ),
+  Widget build(BuildContext context) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(radius),
+        color: Colors.white.withOpacity(0.08),
+        boxShadow: shadow,
       ),
-    ),
-  );
+      child: child,
+    );
+  }
 }
 
 // ─────────────────────────────────────────────
