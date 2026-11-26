@@ -1,0 +1,13 @@
+data_in/
+backend/uploads/
+backend/.env
+*.pyc
+__pycache__/
+node_modules/
+mobile/dist/
+mobile/.expo/
+.pytest_cache/
+.claude/
+mobile/.claude/
+# real (anonymised) student survey rows: keep private, do not publish
+backend/data/real/students_anonymized.csv

@@ -1,139 +1,25 @@
-# DIU SmartAdmit v2.0
-## AI Powered University Admission & Career Guidance System
+# DIU SmartAdmit
 
----
+AI-powered admission and career guidance (guidance only, never an official decision).
 
-## QUICK START
-
-### 1. MongoDB
+## Backend (FastAPI) - `backend/`
 ```bash
-# Local MongoDB
-mongod --dbpath /data/db
-
-# OR use MongoDB Atlas (free):
-# Get connection string from https://cloud.mongodb.com
+cd backend && pip install -r requirements.txt
+cp .env.example .env            # set JWT_SECRET, MONGODB_URI (optional), LLM_API_KEY (optional)
+REAL_DATA_DIR=data/real DEV_ADMIN_EMAIL=admin@example.com DEV_ADMIN_PASSWORD=change-me-123 \
+  uvicorn app.main:app --reload   # API docs at http://localhost:8000/docs
+pytest                           # 50 tests
 ```
+Without `MONGODB_URI` an in-memory database is used (data resets on restart). Without `LLM_API_KEY` the chat returns the best matching passage with its source instead of a generated answer.
 
-### 2. Backend
-```bash
-cd backend
-cp .env.example .env
-# Edit .env: set MONGO_URI and optionally OPENAI_API_KEY
-npm install
-npm run dev
-# Server starts at http://localhost:3000
-# Departments and FAQs auto-seed on first run
-```
+## Your data
+| Step | Command |
+|---|---|
+| Departments sheet -> programs CSV | `python tools/prepare_departments.py ../data_in/departments.xlsx data/real/programs.csv` |
+| Student survey -> anonymised CSV | `python tools/prepare_students.py ../data_in/students.xlsx data/real/students_anonymized.csv` |
+| Evaluate a model on the survey | `python tools/experiment.py data/real/students_anonymized.csv` |
+| Add documents to the chat | admin `POST /admin/knowledge` (PDF/DOCX/TXT) |
+Raw files in `data_in/` contain names and emails: do not publish or commit them.
 
-### 3. Flutter App
-```bash
-cd flutter_app
-flutter pub get
-# Edit lib/utils/constants.dart → set baseUrl:
-#   Android emulator : http://10.0.2.2:3000/api
-#   iOS simulator    : http://localhost:3000/api
-#   Physical device  : http://<YOUR_PC_LAN_IP>:3000/api
-flutter run
-```
-
----
-
-## PREREQUISITES
-| Tool | Version |
-|------|---------|
-| Node.js | v18+ |
-| MongoDB | v6+ (local) or Atlas |
-| Flutter SDK | 3.x |
-| Android Studio / Xcode | Latest |
-| Dart | 3.x |
-
----
-
-## ENVIRONMENT VARIABLES (backend/.env)
-```
-PORT=3000
-NODE_ENV=development
-MONGO_URI=mongodb://localhost:27017/smartadmit
-OPENAI_API_KEY=sk-...   ← optional, app works without it
-```
-
----
-
-## API ROUTES
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | / | Health check |
-| POST | /api/chat | AI chat (free + agent mode) |
-| GET | /api/departments | List all 11 departments |
-| GET | /api/departments/:code | Department detail |
-| POST | /api/recommend | GPA-based recommendation |
-| GET | /api/faq | FAQ list |
-| GET | /api/profile/:sessionId | Student profile |
-| GET | /api/profile/:sessionId/recommendation | AI recommendations |
-| POST | /api/report | Generate HTML report |
-| GET | /api/admin/dashboard | Admin stats |
-| GET | /api/admin/profiles | All student profiles |
-| GET | /api/admin/questions | Popular questions |
-
----
-
-## FEATURES
-- 🤖 **Agentic Assessment** — 7-step guided profile building
-- 🎯 **Confidence Scoring** — 4-dimension AI matching (Academic/Interest/Career/Practical)
-- 👨‍👩‍👧 **Parent Mode** — Summaries in English + Bangla (বাংলা)
-- 🗺️ **Career Roadmap** — Year-by-year plan per department
-- 📄 **Report Generator** — Downloadable HTML report
-- 💬 **Free Chat** — Ad-hoc admission questions
-- 🏛️ **11 DIU Departments** — Full data, careers, salary outlook
-- 🎓 **Scholarship Calculator** — Auto-calculates eligibility
-
----
-
-## PROJECT STRUCTURE
-```
-smartadmit/
-├── backend/
-│   ├── server.js                  ← Express entry point
-│   ├── .env.example
-│   ├── package.json
-│   ├── config/db.js               ← MongoDB + auto-seed
-│   ├── models/                    ← 7 Mongoose models
-│   ├── controllers/               ← 6 controllers
-│   ├── routes/                    ← 7 route files
-│   ├── middleware/errorHandler.js
-│   └── utils/
-│       ├── aiEngine.js            ← Intent detection + free chat
-│       ├── agentEngine.js         ← Step-by-step assessment flow
-│       ├── confidenceEngine.js    ← 4-dimension scoring
-│       └── pdfGenerator.js        ← HTML report builder
-├── flutter_app/
-│   ├── pubspec.yaml
-│   └── lib/
-│       ├── main.dart
-│       ├── models/                ← 5 models
-│       ├── providers/             ← 5 providers
-│       ├── screens/               ← 11 screens
-│       ├── services/api_service.dart
-│       ├── utils/                 ← theme, constants, extensions
-│       └── widgets/               ← 6 widgets
-└── README.md
-```
-
----
-
-## FLUTTER BASE URL CONFIGURATION
-File: `flutter_app/lib/utils/constants.dart`
-```dart
-// Change this line based on your setup:
-static const String baseUrl = 'http://10.0.2.2:3000/api'; // Android emulator
-// static const String baseUrl = 'http://localhost:3000/api'; // iOS simulator
-// static const String baseUrl = 'http://192.168.1.x:3000/api'; // Physical device
-```
-
----
-
-## NOTES
-- MongoDB auto-seeds 11 departments + 9 FAQs on first run
-- OpenAI key is optional — all features work via rule-based fallback
-- Reports download as `.html` files (open in any browser)
-- Session data expires after 24 hours (MongoDB TTL index)
+## Still needed from you
+Admission requirements (min SSC/HSC GPA, accepted groups) per program, scholarship rules, and documents for the chat (brochures, FAQs). Until then eligibility reports "more information required".
